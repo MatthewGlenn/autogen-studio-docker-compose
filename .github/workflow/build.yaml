@@ -1,0 +1,18 @@
+name: Docker Image CI
+
+on: [push] # Use this during testing, replace with the code below when ready to deploy
+# on:
+#   push:
+#     branches:
+#       - main
+      
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag autogen-studio:$(date +%s)
