@@ -1,7 +1,8 @@
 # Use the official Python image as the base image
 FROM python:3.11-slim
 
-LABEL org.opencontainers.image.source https://github.com/matthewglenn/autogen-studio-docker-compose 
+ARG REPO_URL
+LABEL org.opencontainers.image.source $REPO_URL
 
 # Set environment variables for better readability
 ENV APP_HOME=/app \
