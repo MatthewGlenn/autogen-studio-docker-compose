@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - master
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   REGISTRY: ghcr.io
@@ -16,9 +18,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out the repo
       uses: actions/checkout@v4
@@ -42,10 +42,7 @@ jobs:
           echo "The version does not exist in the container registry."
           echo "::set-output name=VERSION_EXISTS::false"
         fi
-      env:
-        LATEST_VERSION: ${{ steps.get_version.outputs.VERSION }}
         
-
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag autogen-studio:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
