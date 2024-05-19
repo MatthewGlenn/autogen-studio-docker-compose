@@ -1,11 +1,11 @@
 name: Docker Image CI
 
-on: [push] # Use this during testing, replace with the code below when ready to deploy
-# on:
-#   push:
-#     branches:
-#       - main
-      
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
 jobs:
   build:
 
