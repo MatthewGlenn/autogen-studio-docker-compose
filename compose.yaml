@@ -1,0 +1,10 @@
+version: "3"
+services:
+  autogenstudio:
+    container_name: autogenstudio
+    image: ghcr.io/matthewglenn/autogen-studio-docker-compose:latest
+    ports:
+      - 8081:8081
+    environment:
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    restart: unless-stopped

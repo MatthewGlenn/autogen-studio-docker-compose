@@ -23,7 +23,7 @@ jobs:
     - name: Check out the repo
       uses: actions/checkout@v4
 
-    - name: Get the latest version number of a given pip package
+    - name: Get the latest version number of the python package
       id: get_version
       run: |
         VERSION=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json | jq -r .info.version)
@@ -34,9 +34,11 @@ jobs:
       run: |
         echo "Checking if the version exists in the container registry..."
         echo "Version: ${{ steps.get_version.outputs.VERSION }}"
-        ORG=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
-        echo "Image: ${{ env.REGISTRY }}/$ORG/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}"
-        if docker manifest inspect ${{ env.REGISTRY }}/$ORG/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
+
+        IMAGE=${{ env.REGISTRY }}/$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+        echo "Image: $IMAGE"
+        
+        if docker manifest inspect $IMAGE > /dev/null 2>&1; then
           echo "The version exists in the container registry."
           echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
         else
@@ -45,10 +47,12 @@ jobs:
         fi
         
     - name: Build the Docker image
+      id: build_docker_image
       run: docker build . --file Dockerfile --tag ${{ env.PACKAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
     - name: Login to the container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
+      id: container_registry_login
       uses: docker/login-action@v3.1.0
       with:
         registry: ${{ env.REGISTRY }}
@@ -57,7 +61,7 @@ jobs:
     
     - name: Upload the Docker image to the container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
-      id: push
+      id: container_registry_upload
       uses: mr-smithers-excellent/docker-build-push@v6.4
       with:
         image: ${{ env.IMAGE_NAME }}
