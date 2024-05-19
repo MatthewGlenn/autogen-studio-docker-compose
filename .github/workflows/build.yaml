@@ -12,6 +12,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.event.repository.name }}
+  PIP_PACKAGE: autogen-studio
 
 jobs:
   build:
@@ -22,14 +23,27 @@ jobs:
     - name: Check out the repo
       uses: actions/checkout@v4
 
-    - name: Get latest Docker image tag from GHCR
-      id: get_image_tag
+    - name: Get the version number of a given pip package
+      id: get_version
       run: |
-        TOKEN=${{ secrets.GHCR_TOKEN }}
-        IMAGE_NAME=${{ env.IMAGE_NAME }}
-        IMAGE_VERSION=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/user/packages/container/$IMAGE_NAME/versions" | jq -r '.[0].name')
-        echo "::set-output name=image_tag::$IMAGE_VERSION"
-        echo "Latest version in the repo is $IMAGE_VERSION"
+        echo "::set-output name=VERSION::$(pip show ${{ env.PIP_PACKAGE }} | grep Version | cut -d ' ' -f 2)"
+
+    - name: Check if the version exists in the container registry by inspecting the manifest of the image in this repository and comparing it with the version of the pip package
+      id: check_version
+      run: |
+        echo "Checking if the version exists in the container registry..."
+        echo "Version: ${{ steps.get_version.outputs.VERSION }}"
+        echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}"
+        if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
+          echo "The version exists in the container registry."
+          echo "::set-output name=VERSION_EXISTS::true"
+        else
+          echo "The version does not exist in the container registry."
+          echo "::set-output name=VERSION_EXISTS::false"
+        fi
+      env:
+        LATEST_VERSION: ${{ steps.get_version.outputs.VERSION }}
+        
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag autogen-studio:$LATEST_VERSION --build-arg REPO_URL=https://github.com/${{ github.repository }}
