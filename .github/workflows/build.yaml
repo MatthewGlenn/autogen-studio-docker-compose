@@ -47,7 +47,7 @@ jobs:
         
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag autogen-studio:$LATEST_VERSION --build-arg REPO_URL=https://github.com/${{ github.repository }}
+      run: docker build . --file Dockerfile --tag autogen-studio:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
     - name: Login to the Container registry
       if: github.event_name != 'pull_request'
