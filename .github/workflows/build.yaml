@@ -21,32 +21,27 @@ jobs:
     steps:
     - name: Check out the repo
       uses: actions/checkout@v4
-      
+
     - name: Get latest Docker image version from GHCR
       id: get_image_version
       run: |
         TOKEN=${{ secrets.GHCR_TOKEN }}
         IMAGE_NAME=${{ env.IMAGE_NAME }}
-        VERSION=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/user/packages/container/$IMAGE_NAME/versions" | jq -r '.[0].name')
-        echo "::set-output name=version::$VERSION"
+        IMAGE_VERSION=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/user/packages/container/$IMAGE_NAME/versions" | jq -r '.[0].name')
+        echo "Latest Docker image version in GHCR: $IMAGE_VERSION"
 
     - name: Check if the version in pip is newer than the latest tagged package in the repo, if there is a new version, build the image, else complete the workflow
       id: check_version
       run: |
-        LATEST_VERSION=$(git describe --tags `git rev-list --tags --max-count=1`)
-        LATEST_VERSION=${LATEST_VERSION:1}
-        echo "Latest version in the repo: $LATEST_VERSION"
-        IMAGE_VERSION=${{ steps.get_image_version.outputs.version }}
         echo "Latest Docker image version in GHCR: $IMAGE_VERSION"
         PIP_VERSION=$(pip show autogen-studio | grep Version | cut -d ' ' -f2)
         echo "Latest version in pip: $PIP_VERSION"
-        if [ "$PIP_VERSION" != "$LATEST_VERSION" ] || [ "$PIP_VERSION" != "$IMAGE_VERSION" ]; then
-          echo "::set-output name=build_image::true"
+        if [ "$PIP_VERSION" != "$IMAGE_VERSION" ]; then
+          BUILD_IMAGE=true
         else
-          echo "::set-output name=build_image::false"
+          BUILD_IMAGE=false
         fi
-        echo "Build image: ${{ steps.check_version.outputs.build_image }}"
-        echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+        echo "Build image: $BUILD_IMAGE"
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag autogen-studio:$LATEST_VERSION --build-arg REPO_URL=https://github.com/${{ github.repository }}
