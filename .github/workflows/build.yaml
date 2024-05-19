@@ -53,7 +53,7 @@ jobs:
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Upload the Docker image to the Container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
@@ -64,4 +64,4 @@ jobs:
         tags: ${{ steps.get_version.outputs.VERSION }}, latest
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GHCR_TOKEN }}
+        password: ${{ secrets.GITHUB_TOKEN }}
