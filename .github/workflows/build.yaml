@@ -34,7 +34,7 @@ jobs:
       run: |
         echo "Checking if the version exists in the container registry..."
         echo "Version: ${{ steps.get_version.outputs.VERSION }}"
-        ORG=$echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
+        ORG=$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')
         echo "Image: ${{ env.REGISTRY }}/$ORG/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}"
         if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
           echo "The version exists in the container registry."
