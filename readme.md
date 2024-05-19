@@ -7,6 +7,7 @@
 
 This README provides instructions for installing, configuring, and managing the AutoGen Studio application using Docker Compose. For more information about AutoGen Studio, visit: https://microsoft.github.io/autogen/blog/2023/12/01/AutoGenStudio/
 
+
 ## Prerequisites
 
 Make sure you have the following:
@@ -17,6 +18,38 @@ Make sure you have the following:
 
 ## Installation
 
+### Using Docker run
+1. Run this docker compose run commmand, replacing the OPEN_API_KEY with your own.
+```bash
+docker run -d \                                                     
+  --name autogenstudio \
+  -p 8081:8081 \
+  -e OPENAI_API_KEY=$OPENAI_API_KEY \
+  --restart unless-stopped \
+  ghcr.io/matthewglenn/autogen-studio-docker-compose:latest
+```
+
+### Using Docker-compose
+1. Use this docker-compose file, replacing the OPEN_API_KEY with your own or using a value in the an `.env` file.
+```yml
+version: "3"
+services:
+  autogenstudio:
+    container_name: autogenstudio
+    image: ghcr.io/matthewglenn/autogen-studio-docker-compose:latest
+    ports:
+      - 8081:8081
+    environment:
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    restart: unless-stopped
+```
+
+2. In the same directory as the docker-compose file, run:
+```bash
+docker-compose up
+```
+
+### Building it yourself
 1. Clone the repository to your local machine:
 
 ```bash
@@ -42,6 +75,9 @@ Customize the generated `.env` file with your desired configuration, including y
 ```bash
 docker-compose up
 ```
+
+## Accessing the container
+Access Autogen Studio using http://localhost:8081
 
 ## Important Note
 
