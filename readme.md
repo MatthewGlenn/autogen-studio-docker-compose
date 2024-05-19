@@ -1,4 +1,7 @@
 # AutoGen Studio with Docker Compose
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/matthewglenn/autogen-studio-docker-compose/build.yaml)
+![Image Version](https://ghcr-badge.egpl.dev/matthewglenn/autogen-studio-docker-compose/latest_tag?color=%2344cc11&ignore=latest&label=version&trim=)
+
 
 ## Overview
 
