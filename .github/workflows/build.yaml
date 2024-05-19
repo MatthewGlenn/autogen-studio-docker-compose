@@ -29,6 +29,7 @@ jobs:
         IMAGE_NAME=${{ env.IMAGE_NAME }}
         IMAGE_VERSION=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/user/packages/container/$IMAGE_NAME/versions" | jq -r '.[0].name')
         echo "::set-output name=image_tag::$IMAGE_VERSION"
+        echo "Latest version in the repo is $IMAGE_VERSION"
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag autogen-studio:$LATEST_VERSION --build-arg REPO_URL=https://github.com/${{ github.repository }}
