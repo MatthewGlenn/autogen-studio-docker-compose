@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check out the repo
+      uses: actions/checkout@v4
+      
     - name: Get latest Docker image version from GHCR
       id: get_image_version
       run: |
@@ -44,9 +47,6 @@ jobs:
         fi
         echo "Build image: ${{ steps.check_version.outputs.build_image }}"
         echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
-
-    - name: Check out the repo
-      uses: actions/checkout@v4
 
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag autogen-studio:$LATEST_VERSION --build-arg REPO_URL=https://github.com/${{ github.repository }}
