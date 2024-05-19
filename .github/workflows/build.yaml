@@ -29,7 +29,7 @@ jobs:
         VERSION=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json | jq -r .info.version)
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Check if the version exists in the container registry by inspecting the manifest of the image in this repository and comparing it with the version of the pip package
+    - name: Compare PIP version with last created package in the container registry
       id: check_version
       run: |
         echo "Checking if the version exists in the container registry..."
@@ -45,9 +45,9 @@ jobs:
         fi
         
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag autogen-studio:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
+      run: docker build . --file Dockerfile --tag ${{ env.PACKAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
-    - name: Login to the Container registry
+    - name: Login to the container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
       uses: docker/login-action@v3.1.0
       with:
@@ -55,7 +55,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Upload the Docker image to the Container registry
+    - name: Upload the Docker image to the container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
       id: push
       uses: mr-smithers-excellent/docker-build-push@v6.4
