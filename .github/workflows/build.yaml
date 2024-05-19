@@ -27,7 +27,7 @@ jobs:
       id: get_version
       run: |
         VERSION=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json | jq -r .info.version)
-        echo "::set-output name=VERSION::$VERSION"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Check if the version exists in the container registry by inspecting the manifest of the image in this repository and comparing it with the version of the pip package
       id: check_version
@@ -37,10 +37,10 @@ jobs:
         echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}"
         if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
           echo "The version exists in the container registry."
-          echo "::set-output name=VERSION_EXISTS::true"
+          echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
         else
           echo "The version does not exist in the container registry."
-          echo "::set-output name=VERSION_EXISTS::false"
+          echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
         fi
         
     - name: Build the Docker image
