@@ -1,6 +1,7 @@
 # Use the official Python image as the base image
 FROM python:3.11-slim
 
+# Set the image source from the repo url
 ARG REPO_URL
 LABEL org.opencontainers.image.source $REPO_URL
 

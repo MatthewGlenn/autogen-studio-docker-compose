@@ -7,6 +7,7 @@
 
 This README provides instructions for installing, configuring, and managing the AutoGen Studio application using Docker Compose. For more information about AutoGen Studio, visit: https://microsoft.github.io/autogen/blog/2023/12/01/AutoGenStudio/
 
+This is a fork of of Dan Murfitt's repo https://github.com/danmurf/autogen-studio-docker-compose
 
 ## Prerequisites
 
@@ -29,9 +30,9 @@ docker run -d \
   ghcr.io/matthewglenn/autogen-studio-docker-compose:latest
 ```
 
-### Using Docker-compose
-1. Use this docker-compose file, replacing the OPEN_API_KEY with your own or using a value in the an `.env` file.
-```yml
+### Using Docker Compose
+1. Use this docker compose file, replacing the OPEN_API_KEY with your own or using a value in the an `.env` file.
+```yaml
 version: "3"
 services:
   autogenstudio:
@@ -44,33 +45,7 @@ services:
     restart: unless-stopped
 ```
 
-2. In the same directory as the docker-compose file, run:
-```bash
-docker-compose up
-```
-
-### Building it yourself
-1. Clone the repository to your local machine:
-
-```bash
-git clone https://github.com/danmurf/autogen-studio-docker-compose.git
-```
-
-2. Navigate to the project directory:
-
-```bash
-cd autogen-studio-docker-compose
-```
-
-3. Create the environment file `.env` by copying the example file:
-
-```bash
-make .env
-```
-
-Customize the generated `.env` file with your desired configuration, including your OpenAI API key.
-
-4. Build and start the AutoGen Studio application using Docker Compose:
+1. Build and start the AutoGen Studio application using Docker Compose:
 
 ```bash
 docker-compose up
