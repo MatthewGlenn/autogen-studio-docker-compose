@@ -8,22 +8,43 @@ on:
   push:
     branches:
       - master
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.event.repository.name }}
+  PACKAGE_NAME: autogenstudio
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out the repo
       uses: actions/checkout@v4
 
+    - name: Get the latest version number of a given pip package
+      id: get_version
+      run: |
+        VERSION=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json | jq -r .info.version)
+        echo "::set-output name=VERSION::$VERSION"
+
+    - name: Check if the version exists in the container registry by inspecting the manifest of the image in this repository and comparing it with the version of the pip package
+      id: check_version
+      run: |
+        echo "Checking if the version exists in the container registry..."
+        echo "Version: ${{ steps.get_version.outputs.VERSION }}"
+        echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}"
+        if docker manifest inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} > /dev/null 2>&1; then
+          echo "The version exists in the container registry."
+          echo "::set-output name=VERSION_EXISTS::true"
+        else
+          echo "The version does not exist in the container registry."
+          echo "::set-output name=VERSION_EXISTS::false"
+        fi
+        
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag autogen-studio:$(date +%s) --build-arg REPO_URL=https://github.com/${{ github.repository }}
+      run: docker build . --file Dockerfile --tag autogen-studio:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
     - name: Login to the Container registry
       if: github.event_name != 'pull_request'
