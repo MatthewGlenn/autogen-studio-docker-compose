@@ -25,7 +25,7 @@ jobs:
       run: docker build . --file Dockerfile --tag autogen-studio:$(date +%s)
     
     - name: Store the image as a tarball
-      run: docker save autogen-studio:$(date +%s) > autogen-studio.tar
+      run: docker save autogen-studio > autogen-studio.tar
 
     - name: Include the Docker image in the workflow as an artifact
       uses: actions/upload-artifact@v2
