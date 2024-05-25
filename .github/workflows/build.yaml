@@ -73,7 +73,7 @@ jobs:
         registry: ${{ env.REGISTRY }}
         pushImage: ${{ steps.check_version.outputs.PUSH_IMAGE }}
         multiPlatform: true
-        platform: linux/amd64,linux/arm64,linux/arm/v7
+        platform: linux/amd64,linux/arm64
         overrideDriver: true
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
