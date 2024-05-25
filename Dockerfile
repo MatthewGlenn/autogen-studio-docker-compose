@@ -1,5 +1,5 @@
 # Use the official Python image as the base image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set the image source from the repo url
 ARG REPO_URL
@@ -16,6 +16,9 @@ RUN mkdir /data
 
 # Copy the local code to the container
 COPY . $APP_HOME
+
+# Install packaging tools
+RUN pip install packaging
 
 # Install latest version of autogenstudio
 RUN pip install autogenstudio
