@@ -76,6 +76,5 @@ jobs:
         registry: ${{ env.REGISTRY }}
         pushImage: ${{ steps.check_version.outputs.PUSH_IMAGE }}
         platform: ${{ matrix.platform }}
-        overrideDriver: true
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
