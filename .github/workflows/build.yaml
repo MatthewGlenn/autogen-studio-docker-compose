@@ -38,12 +38,18 @@ jobs:
         IMAGE=${{ env.REGISTRY }}/$(echo "${{ github.actor }}" | tr '[:upper:]' '[:lower:]')/${{ env.IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
         echo "Image: $IMAGE"
         
+        echo "PUSH_IMAGE=false" >> $GITHUB_OUTPUT
+
         if docker manifest inspect $IMAGE > /dev/null 2>&1; then
           echo "The version exists in the container registry."
           echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
         else
           echo "The version does not exist in the container registry."
           echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
+          if ${{ github.event_name }} != 'pull_request'; then
+            echo "Skipping the push steps."
+            echo "PUSH_IMAGE=true" >> $GITHUB_OUTPUT
+          fi
         fi
 
     # - name: Login to the container registry
@@ -59,14 +65,14 @@ jobs:
     #   run: docker buildx build . --progress plain --platform linux/amd64,linux/i386,linux/arm/v5,linux/arm/v6,linux/arm/v7,linux/arm64 --file Dockerfile --tag ${{ env.PACKAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
     - name: Upload the Docker image to the container registry
-      # if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
       id: container_registry_upload
       uses: mr-smithers-excellent/docker-build-push@v6.4
       with:
         image: ${{ env.IMAGE_NAME }}
         tags: ${{ steps.get_version.outputs.VERSION }}, latest
         registry: ${{ env.REGISTRY }}
-        pushImage: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
-        # platform: linux/amd64,linux/arm64,linux/arm/v7
+        pushImage: ${{ steps.check_version.outputs.PUSH_IMAGE }}
+        platform: linux/amd64,linux/arm64,linux/arm/v7
+        overrideDriver: true
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
