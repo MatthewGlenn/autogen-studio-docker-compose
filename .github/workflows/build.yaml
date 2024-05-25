@@ -72,10 +72,9 @@ jobs:
       uses: mr-smithers-excellent/docker-build-push@v6
       with:
         image: ${{ env.IMAGE_NAME }}
-        tags: ${{ steps.get_version.outputs.VERSION }}, latest
+        tags: ${{ steps.get_version.outputs.VERSION }}, latest, ${{ matrix.platform }}
         registry: ${{ env.REGISTRY }}
         pushImage: ${{ steps.check_version.outputs.PUSH_IMAGE }}
-        multiPlatform: true
         platform: ${{ matrix.platform }}
         overrideDriver: true
         username: ${{ github.actor }}
