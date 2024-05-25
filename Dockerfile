@@ -17,6 +17,9 @@ RUN mkdir /data
 # Copy the local code to the container
 COPY . $APP_HOME
 
+# Install packaging tools
+RUN pip install packaging
+
 # Install latest version of autogenstudio
 RUN pip install autogenstudio
 
