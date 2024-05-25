@@ -67,6 +67,6 @@ jobs:
         tags: ${{ steps.get_version.outputs.VERSION }}, latest
         registry: ${{ env.REGISTRY }}
         pushImage: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
-        platform: linux/amd64,linux/arm64,linux/arm/v7
+        # platform: linux/amd64,linux/arm64,linux/arm/v7
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
