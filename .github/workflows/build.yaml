@@ -48,7 +48,7 @@ jobs:
         
     - name: Build the Docker image
       id: build_docker_image
-      run: docker build . --file Dockerfile --tag ${{ env.PACKAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
+      run: docker buildx build . --progress plain --platform linux/amd64,linux/i386,linux/arm/v5,linux/arm/v6,linux/arm/v7,linux/arm64 --file Dockerfile --tag ${{ env.PACKAGE_NAME }}:${{ steps.get_version.outputs.VERSION }} --build-arg REPO_URL=https://github.com/${{ github.repository }}
     
     - name: Login to the container registry
       if: github.event_name != 'pull_request' && steps.check_version.outputs.VERSION_EXISTS == 'false'
