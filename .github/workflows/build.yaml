@@ -75,6 +75,7 @@ jobs:
         tags: ${{ steps.get_version.outputs.VERSION }}, latest
         registry: ${{ env.REGISTRY }}
         pushImage: ${{ steps.check_version.outputs.PUSH_IMAGE }}
+        multiPlatform: true
         platform: ${{ matrix.platform }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
